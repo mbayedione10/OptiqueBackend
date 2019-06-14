@@ -159,6 +159,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
+parent_dir = os.path.abspath(os.path.dirname(__file__) + '/..')
+MEDIA_ROOT = os.path.join(parent_dir, 'api/')
+MEDIA_URL = '/api/'
+CORS_ORIGIN_ALLOW_ALL = True
 
 AUTH_USER_MODEL = 'api.CustomUser'
