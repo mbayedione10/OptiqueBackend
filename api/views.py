@@ -117,11 +117,78 @@ class ClientCreateView(generics.CreateAPIView):
 
         }, status=status.HTTP_201_CREATED)
 
-class CommandeCreateView(generics.CreateAPIView):
+
+class ClientUpdateView(generics.CreateAPIView):
     permission_classes = (
-       permissions.IsAuthenticated,
+        permissions.IsAuthenticated,
     )
     #permission_classes = ()
+    serializer_class = ClientSerializer
+    def put (self, request, *args, **kwargs):
+        try:
+            client = Client.objects.get(id= kwargs['pk'])
+        except Client.DoesNotExist:
+            return Response({
+                "status": "failure",
+                "message": "no such item"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        client_data = {
+            'firstname': request.data['firstname'],
+            'lastname': request.data['lastname'],
+            'phone': request.data['phone'],
+            'photo': request.data['photo'],
+            'adress': request.data['adress'],
+        }
+
+        serializer = ClientSerializer(client, data = client_data, partial = True)
+
+        if not serializer.is_valid():
+            return Response({
+                    "status": "failure",
+                    "message": "invalid data",
+                    "eroors": serializer.errors
+
+            },status = status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({
+            "status": "success",
+            "message": "item successfully update.",
+            "data": serializer.data
+
+        },status = status.HTTP_200_OK)
+
+
+class ClientDeleteView(generics.CreateAPIView):
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
+    serializer_class = ClientSerializer
+    def get (self, request, *args, **kwargs):
+        try:
+            client = Client.objects.get(id = kwargs['pk'])
+        except Client.DoesNotExist:
+            return Response({
+                "status": "failure",
+                "message": "no such item"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        client.delete()
+        return Response({
+            "status": "success",
+            "message": "item successfully deleted."
+
+        },status = status.HTTP_200_OK)
+
+
+
+class CommandeCreateView(generics.CreateAPIView):
+    #permission_classes = (
+     #  permissions.IsAuthenticated,
+    #)
+    permission_classes = ()
     serializer_class = CommandeSerializer
     def get(self, request, *args, **kwargs):
         com = Commande.objects.all()
@@ -162,11 +229,81 @@ class CommandeCreateView(generics.CreateAPIView):
 
         }, status=status.HTTP_201_CREATED)
 
+
+class CommandeUpdateView(generics.CreateAPIView):
+    #permission_classes = (
+    #    permissions.IsAuthenticated,
+    #)
+    permission_classes = ()
+    serializer_class = CommandeSerializer
+    def put (self, request, *args, **kwargs):
+        try:
+            com = Commande.objects.get(id= kwargs['pk'])
+        except Commande.DoesNotExist:
+            return Response({
+                "status": "failure",
+                "message": "no such item"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        commande_data = {
+            'client': request.data['client'],
+            'user': request.data['user'],
+            'lunette': request.data['lunette'],
+            'date': request.data['date'],
+            'nbre_lunettes': request.data['nbre_lunettes'],
+            'montant_total': request.data['montant_total'],
+        }
+
+        serializer = CommandeSerializer(com, data = commande_data, partial = True)
+
+        if not serializer.is_valid():
+            return Response({
+                    "status": "failure",
+                    "message": "invalid data",
+                    "eroors": serializer.errors
+
+            },status = status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({
+            "status": "success",
+            "message": "item successfully update.",
+            "data": serializer.data
+
+        },status = status.HTTP_200_OK)
+
+
+class CommandeDeleteView(generics.CreateAPIView):
+    #permission_classes = (
+    #    permissions.IsAuthenticated,
+    #)
+    permission_classes = ()
+    serializer_class = CommandeSerializer
+    def get (self, request, *args, **kwargs):
+        try:
+            commande = Commande.objects.get(id = kwargs['pk'])
+        except Commande.DoesNotExist:
+            return Response({
+                "status": "failure",
+                "message": "no such item"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        commande.delete()
+        return Response({
+            "status": "success",
+            "message": "item successfully deleted."
+
+        },status = status.HTTP_200_OK)
+
+
+
+
+
 class LunetteCreateView(generics.CreateAPIView):
-    permission_classes = (
-       permissions.IsAuthenticated,
-    )
-    #permission_classes = ()
+    #permission_classes = (
+    #   permissions.IsAuthenticated,
+    #)
+    permission_classes = ()
     serializer_class = LunetteSerializer
     def get(self, request, *args, **kwargs):
         lunette = Lunette.objects.all()
@@ -206,3 +343,67 @@ class LunetteCreateView(generics.CreateAPIView):
             "data": serializer.data
 
         }, status=status.HTTP_201_CREATED)
+
+
+class LunetteUpdateView(generics.CreateAPIView):
+    #permission_classes = (
+    #    permissions.IsAuthenticated,
+    #)
+    permission_classes = ()
+    serializer_class = LunetteSerializer
+    def put (self, request, *args, **kwargs):
+        try:
+            lunette = Lunette.objects.get(id= kwargs['pk'])
+        except Lunette.DoesNotExist:
+            return Response({
+                "status": "failure",
+                "message": "no such item"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        lunette_data = {
+            'name': request.data['name'],
+            'type': request.data['type'],
+            'price': request.data['price'],
+            'photo': request.data['photo'],
+        }
+
+        serializer = LunetteSerializer(lunette, data = lunette_data, partial = True)
+
+        if not serializer.is_valid():
+            return Response({
+                    "status": "failure",
+                    "message": "invalid data",
+                    "eroors": serializer.errors
+
+            },status = status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({
+            "status": "success",
+            "message": "item successfully update.",
+            "data": serializer.data
+
+        },status = status.HTTP_200_OK)
+
+
+class LunetteDeleteView(generics.CreateAPIView):
+    #permission_classes = (
+    #    permissions.IsAuthenticated,
+    #)
+    permission_classes = ()
+    serializer_class = LunetteSerializer
+    def get (self, request, *args, **kwargs):
+        try:
+            lunette = Lunette.objects.get(id = kwargs['pk'])
+        except Lunette.DoesNotExist:
+            return Response({
+                "status": "failure",
+                "message": "no such item"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        lunette.delete()
+        return Response({
+            "status": "success",
+            "message": "item successfully deleted."
+
+        },status = status.HTTP_200_OK)
