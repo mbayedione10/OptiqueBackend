@@ -68,15 +68,43 @@ def login(request):
                     status=status.HTTP_200_OK)
 
 
+#information de l'utilisateur qui a fait la commande
+class UserByCommandeView(generics.ListAPIView):
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
+    userSet = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    def get(self, request, *args, **kwargs):
+        user = CustomUser.objects.filter(commande = kwargs['pk'])
+
+        if not user:
+            return Response({
+                "status": "failure",
+                "message": "no such item.",
+            }, status = status.HTTP_404_NOT_FOUND)
+
+        serializer = UserSerializer(user, many = True)
+
+        return Response({
+            "status": "success",
+            "message": "item successfully retrieved.",
+            "count": user.count(),
+            "data": serializer.data
+
+        },status = status.HTTP_200_OK)
 
 
 
+#ajouter des clients  et les lister
 class ClientCreateView(generics.CreateAPIView):
     permission_classes = (
         permissions.IsAuthenticated,
     )
     #permission_classes = ()
     serializer_class = ClientSerializer
+    #liste des clients
     def get(self, request, *args, **kwargs):
         client = Client.objects.all()
 
@@ -98,7 +126,7 @@ class ClientCreateView(generics.CreateAPIView):
         },status = status.HTTP_200_OK)
 
 
-
+    #enregistrer un client
     def post (self, request, *args, **kwargs):
         serializer = ClientSerializer(data = request.data)
         if not serializer.is_valid():
@@ -117,7 +145,7 @@ class ClientCreateView(generics.CreateAPIView):
 
         }, status=status.HTTP_201_CREATED)
 
-
+#modifier un client
 class ClientUpdateView(generics.CreateAPIView):
     permission_classes = (
         permissions.IsAuthenticated,
@@ -126,6 +154,7 @@ class ClientUpdateView(generics.CreateAPIView):
     serializer_class = ClientSerializer
     def put (self, request, *args, **kwargs):
         try:
+            #recuperer l'id du client
             client = Client.objects.get(id= kwargs['pk'])
         except Client.DoesNotExist:
             return Response({
@@ -140,7 +169,7 @@ class ClientUpdateView(generics.CreateAPIView):
             'photo': request.data['photo'],
             'adress': request.data['adress'],
         }
-
+        #inserer les modifications
         serializer = ClientSerializer(client, data = client_data, partial = True)
 
         if not serializer.is_valid():
@@ -159,7 +188,7 @@ class ClientUpdateView(generics.CreateAPIView):
 
         },status = status.HTTP_200_OK)
 
-
+#supprimer un client
 class ClientDeleteView(generics.CreateAPIView):
     permission_classes = (
         permissions.IsAuthenticated,
@@ -168,6 +197,7 @@ class ClientDeleteView(generics.CreateAPIView):
     serializer_class = ClientSerializer
     def get (self, request, *args, **kwargs):
         try:
+            #recuperer l'id du client
             client = Client.objects.get(id = kwargs['pk'])
         except Client.DoesNotExist:
             return Response({
@@ -182,14 +212,72 @@ class ClientDeleteView(generics.CreateAPIView):
 
         },status = status.HTTP_200_OK)
 
+#retrouver le client a partir de son id
+class ClientByIdView(generics.ListAPIView):
+    #Autorisation si la personne est connectée
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
+    ClientSet = Client.objects.all()
+    serializer_class = ClientSerializer
+    def get(self, request, *args, **kwargs):
+        client =Client.objects.filter(id = kwargs['pk'])
+
+        if not client:
+            return Response({
+                "status": "failure",
+                "message": "no such item.",
+            }, status = status.HTTP_404_NOT_FOUND)
+
+        serializer = ClientSerializer(client, many = True)
+
+        return Response({
+            "status": "success",
+            "message": "item successfully retrieved.",
+            "count": client.count(),
+            "data": serializer.data
+
+                },status = status.HTTP_200_OK)
 
 
-class CommandeCreateView(generics.CreateAPIView):
+#information du client d'une commande
+class ClientByCommandeView(generics.ListAPIView):
     #permission_classes = (
-     #  permissions.IsAuthenticated,
+    #    permissions.IsAuthenticated,
     #)
     permission_classes = ()
+    ClientSet = Client.objects.all()
+    serializer_class = ClientSerializer
+    def get(self, request, *args, **kwargs):
+        client = Client.objects.filter(commande = kwargs['pk'])
+
+        if not client:
+            return Response({
+                "status": "failure",
+                "message": "no such item.",
+            }, status = status.HTTP_404_NOT_FOUND)
+
+        serializer = ClientSerializer(client, many = True)
+
+        return Response({
+            "status": "success",
+            "message": "item successfully retrieved.",
+            "count": client.count(),
+            "data": serializer.data
+
+        },status = status.HTTP_200_OK)
+
+
+
+#ajouter une commande
+class CommandeCreateView(generics.CreateAPIView):
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
     serializer_class = CommandeSerializer
+    #liste des commandes
     def get(self, request, *args, **kwargs):
         com = Commande.objects.all()
 
@@ -209,7 +297,7 @@ class CommandeCreateView(generics.CreateAPIView):
 
         },status = status.HTTP_200_OK)
 
-
+    #ajouter une commande
     @csrf_exempt
     def post (self, request, *args, **kwargs):
         serializer = CommandeSerializer(data = request.data)
@@ -229,15 +317,16 @@ class CommandeCreateView(generics.CreateAPIView):
 
         }, status=status.HTTP_201_CREATED)
 
-
+#modifier une commande
 class CommandeUpdateView(generics.CreateAPIView):
-    #permission_classes = (
-    #    permissions.IsAuthenticated,
-    #)
-    permission_classes = ()
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
     serializer_class = CommandeSerializer
     def put (self, request, *args, **kwargs):
         try:
+            #recuperer l'id de la commande
             com = Commande.objects.get(id= kwargs['pk'])
         except Commande.DoesNotExist:
             return Response({
@@ -253,7 +342,7 @@ class CommandeUpdateView(generics.CreateAPIView):
             'nbre_lunettes': request.data['nbre_lunettes'],
             'montant_total': request.data['montant_total'],
         }
-
+        #enregistrer les commandes
         serializer = CommandeSerializer(com, data = commande_data, partial = True)
 
         if not serializer.is_valid():
@@ -272,11 +361,12 @@ class CommandeUpdateView(generics.CreateAPIView):
 
         },status = status.HTTP_200_OK)
 
-
+#supprimer une commande a partir de l'id
 class CommandeDeleteView(generics.CreateAPIView):
-    #permission_classes = (
-    #    permissions.IsAuthenticated,
-    #)
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
     permission_classes = ()
     serializer_class = CommandeSerializer
     def get (self, request, *args, **kwargs):
@@ -296,15 +386,43 @@ class CommandeDeleteView(generics.CreateAPIView):
         },status = status.HTTP_200_OK)
 
 
+#retrouver la commande a partir de son id
+class CommandeByIdView(generics.ListAPIView):
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
+    commandeSet = Commande.objects.all()
+    serializer_class = CommandeSerializer
+    def get(self, request, *args, **kwargs):
+        commande =Commande.objects.filter(id = kwargs['pk'])
+
+        if not commande:
+            return Response({
+                "status": "failure",
+                "message": "no such item.",
+            }, status = status.HTTP_404_NOT_FOUND)
+
+        serializer = CommandeSerializer(commande, many = True)
+
+        return Response({
+            "status": "success",
+            "message": "item successfully retrieved.",
+            "count": commande.count(),
+            "data": serializer.data
+
+                },status = status.HTTP_200_OK)
+
 
 
 
 class LunetteCreateView(generics.CreateAPIView):
-    #permission_classes = (
-    #   permissions.IsAuthenticated,
-    #)
-    permission_classes = ()
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
     serializer_class = LunetteSerializer
+    #liste des lunettes
     def get(self, request, *args, **kwargs):
         lunette = Lunette.objects.all()
 
@@ -324,7 +442,7 @@ class LunetteCreateView(generics.CreateAPIView):
 
         },status = status.HTTP_200_OK)
 
-
+    #ajouter une lunette
     @csrf_exempt
     def post (self, request, *args, **kwargs):
         serializer = LunetteSerializer(data = request.data)
@@ -344,12 +462,12 @@ class LunetteCreateView(generics.CreateAPIView):
 
         }, status=status.HTTP_201_CREATED)
 
-
+#mettre a jour les informations d'une lunette
 class LunetteUpdateView(generics.CreateAPIView):
-    #permission_classes = (
-    #    permissions.IsAuthenticated,
-    #)
-    permission_classes = ()
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
     serializer_class = LunetteSerializer
     def put (self, request, *args, **kwargs):
         try:
@@ -385,12 +503,12 @@ class LunetteUpdateView(generics.CreateAPIView):
 
         },status = status.HTTP_200_OK)
 
-
+#supprimer une lunette a partir de l'id
 class LunetteDeleteView(generics.CreateAPIView):
-    #permission_classes = (
-    #    permissions.IsAuthenticated,
-    #)
-    permission_classes = ()
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
     serializer_class = LunetteSerializer
     def get (self, request, *args, **kwargs):
         try:
@@ -405,5 +523,59 @@ class LunetteDeleteView(generics.CreateAPIView):
         return Response({
             "status": "success",
             "message": "item successfully deleted."
+
+        },status = status.HTTP_200_OK)
+
+#retrouver la lunette a partir de son id
+class LunetteByIdView(generics.ListAPIView):
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
+    lunetteSet = Lunette.objects.all()
+    serializer_class = LunetteSerializer
+    def get(self, request, *args, **kwargs):
+        lunette =Lunette.objects.filter(id = kwargs['pk'])
+
+        if not lunette:
+            return Response({
+                "status": "failure",
+                "message": "no such item.",
+            }, status = status.HTTP_404_NOT_FOUND)
+
+        serializer = LunetteSerializer(lunette, many = True)
+
+        return Response({
+            "status": "success",
+            "message": "item successfully retrieved.",
+            "count": lunette.count(),
+            "data": serializer.data
+
+                },status = status.HTTP_200_OK)
+
+#information de la lunette d'une commande
+class LunetteByCommandeView(generics.ListAPIView):
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    #permission_classes = ()
+    lunette = Lunette.objects.all()
+    serializer_class = LunetteSerializer
+    def get(self, request, *args, **kwargs):
+        lunette = Lunette.objects.filter(commande = kwargs['pk'])
+
+        if not lunette:
+            return Response({
+                "status": "failure",
+                "message": "no such item.",
+            }, status = status.HTTP_404_NOT_FOUND)
+
+        serializer = LunetteSerializer(lunette, many = True)
+
+        return Response({
+            "status": "success",
+            "message": "item successfully retrieved.",
+            "count": lunette.count(),
+            "data": serializer.data
 
         },status = status.HTTP_200_OK)

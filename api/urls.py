@@ -42,11 +42,15 @@ urlpatterns = [
 
     url(r'^clientdelete/(?P<pk>[0-9]+)/$', views.ClientDeleteView.as_view()),
 
+    url(r'^clientByCommande/(?P<pk>[0-9]+)/$',views.ClientByCommandeView.as_view()),
+
     url(r'^commande/$', views.CommandeCreateView.as_view(), name='commande'),
 
     url(r'^commandeupdate/(?P<pk>[0-9]+)/$', views.CommandeUpdateView.as_view()),
 
     url(r'^commandedelete/(?P<pk>[0-9]+)/$', views.CommandeDeleteView.as_view()),
+
+    url(r'^commandeById/(?P<pk>[0-9]+)/$',views.CommandeByIdView.as_view()),
 
     url(r'^lunette/$', views.LunetteCreateView.as_view(), name='lunette'),
 
@@ -54,6 +58,13 @@ urlpatterns = [
 
     url(r'^lunettedelete/(?P<pk>[0-9]+)/$', views.LunetteDeleteView.as_view()),
 
+    url(r'^lunetteById/(?P<pk>[0-9]+)/$',views.LunetteByIdView.as_view()),
+
+    url(r'^lunetteByCommande/(?P<pk>[0-9]+)/$',views.LunetteByCommandeView.as_view()),
+
+    url(r'^clientById/(?P<pk>[0-9]+)/$',views.ClientByIdView.as_view()),
+
+    url(r'^userByCommande/(?P<pk>[0-9]+)/$',views.UserByCommandeView.as_view()),
 
 
 
